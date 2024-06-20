@@ -34,8 +34,8 @@ FLAGS = flags.FLAGS
 flags.DEFINE_string(
     "pretrained_path", "hf://rail-berkeley/octo-base-1.5", "Path to pre-trained Octo checkpoint directory."
 )
-flags.DEFINE_string("data_dir", "/home/aalto-robotics/tensorflow_datasets/", "Path to finetuning dataset, in RLDS format.")
-flags.DEFINE_string("save_dir", "/home/aalto-robotics/Xiwei/Octo/test_finetuned_checkpoints", "Directory for saving finetuning checkpoints.")
+flags.DEFINE_string("data_dir", "tensorflow_datasets", "Path to finetuning dataset, in RLDS format.")
+flags.DEFINE_string("save_dir", "test_finetuned_checkpoints", "Directory for saving finetuning checkpoints.")
 flags.DEFINE_integer("batch_size",16, "Batch size for finetuning.")
 
 flags.DEFINE_bool(
