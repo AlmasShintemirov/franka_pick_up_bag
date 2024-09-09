@@ -32,11 +32,11 @@ from octo.utils.train_utils import (
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string(
-    "pretrained_path", "hf://rail-berkeley/octo-base-1.5", "Path to pre-trained Octo checkpoint directory."
+    "pretrained_path", "/scratch/work/zhaox9/finetuned_checkpoints/isaacsim_checkpoints/", "Path to pre-trained Octo checkpoint directory."
 )
-flags.DEFINE_string("data_dir", "tensorflow_datasets", "Path to finetuning dataset, in RLDS format.")
+flags.DEFINE_string("data_dir", "/scratch/work/zhaox9/rlds_dataset_builder_own/tfds_build/rosdata/example_dataset/1.0.0/", "Path to finetuning dataset, in RLDS format.")
 # save_dir: must be absolute path
-flags.DEFINE_string("save_dir", "/scratch/work/zhaox9/franka_pick_up_bag/test_finetuned_checkpoints", "Directory for saving finetuning checkpoints.")
+flags.DEFINE_string("save_dir", "/scratch/work/zhaox9/finetuned_checkpoints/isaacsim_checkpoints/", "Directory for saving finetuning checkpoints.")
 flags.DEFINE_integer("batch_size",16, "Batch size for finetuning.")
 
 flags.DEFINE_bool(
@@ -71,8 +71,7 @@ def main(_):
         dataset_kwargs=dict(
             name="example_dataset",
             data_dir=FLAGS.data_dir,
-            # image_obs_keys={"primary": "image", "wrist": "wrist_image"}, # 更名
-            image_obs_keys={"primary": "image"}, # 减少一个camera，但是内存还是不够
+            image_obs_keys={"primary": "image", "wrist": "wrist_image"}, # 更名
             proprio_obs_key="state",
             language_key="language_instruction",
         ),
@@ -106,20 +105,19 @@ def main(_):
 
     # load pre-training config and modify --> remove wrist cam, add proprio input, change action head
     # following Zhao et al. we use "action chunks" of length 50 and L1 loss for ALOHA
-    ######################################################################################TODO：预处理
+    ##TODO：预处理
     config = pretrained_model.config
-    # del config["model"]["observation_tokenizers"]["wrist"]
     # ### EMMA: 又感觉不应该删掉这个proprio，因为这个proprio是state
-    # config["model"]["observation_tokenizers"]["proprio"] = ModuleSpec.create(
-    #     LowdimObsTokenizer,
-    #     n_bins=256,
-    #     bin_type="normal",
-    #     low=-2.0,
-    #     high=2.0,
-    #     obs_keys=["proprio"],
-    # )
+    config["model"]["observation_tokenizers"]["proprio"] = ModuleSpec.create(
+        LowdimObsTokenizer,
+        n_bins=256,
+        bin_type="normal",
+        low=-2.0,
+        high=2.0,
+        obs_keys=["proprio"],
+    )
     # Fully override the old action head with a new one (for smaller changes, you can use update_config)
-    #####################TODO: 修复了维度不匹配的bug
+    ##TODO: 修复了维度不匹配的bug
     config["model"]["heads"]["action"] = ModuleSpec.create(
         L1ActionHead,
         action_horizon=50,
@@ -168,7 +166,6 @@ def main(_):
             batch["observation"]["timestep_pad_mask"],
             train=train,
         )
-        ########################################################TODO: 有bug，维度不匹配
         action_loss, action_metrics = bound_module.heads["action"].loss(
             transformer_embeddings,  # Action head knows to pull out the action readout_key
             batch["action"],
