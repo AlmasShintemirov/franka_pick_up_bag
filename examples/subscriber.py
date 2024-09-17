@@ -44,7 +44,7 @@ class Subscriber(Node):
         self.destroy_subscription(self.subscription)
         self.subscription = None
 
-def sub_call(node, topic='/Camera_rgb'):
+def sub_call(node, topic='/Camera_rgb',size=(512,512,3)):
     future = node.subscribe_once(topic)
 
     executor = MultiThreadedExecutor()
@@ -53,7 +53,12 @@ def sub_call(node, topic='/Camera_rgb'):
         
         if future.done():
             break
-    return future.result()
+
+        if not size:
+            return future.result()
+
+        msg_result = future.result()
+        return np.array(msg_result.data).reshape(size)
 
 # class LanguageSubscriber(Node):
 
