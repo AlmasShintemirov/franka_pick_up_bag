@@ -68,41 +68,9 @@ def get_observation(node ,topic_type, topic, size=(256,256,3)):
     input_images = wait_for_message(node, topic_type, topic)
     input_images = np.array(input_images.data).reshape(size)
 
-    input_images = np.stack(input_images)[None]
-    input_images = np.stack(input_images)[None]
+    # input_images = np.stack(input_images)[None]
+    # input_images = np.stack(input_images)[None]
 
     return input_images
     
 
-
-# def sub_call(node, topic='/Camera_rgb',size=(512,512,3)):
-#     future = node.subscribe_once(topic)
-#     print("get the future")
-
-#     executor = MultiThreadedExecutor()
-#     while rclpy.ok():
-#         rclpy.spin_once(node, timeout_sec=0.1)
-        
-#         if future.done():
-#             break
-
-#         if not size:
-#             return future.result()
-
-#         msg_result = future.result()
-#         return np.array(msg_result.data).reshape(size)
-
-# class LanguageSubscriber(Node):
-
-#     def __init__(self):
-#         super().__init__('language_subscriber')
-        
-#         self.subscription = self.create_subscription(
-#             String,
-#             'language_topic',
-#             self.listener_callback,
-#             10)
-#         self.subscription
-
-#     def listener_callback(self, msg):
-#         self.get_logger().info('Received: "%s"' % msg.data)
