@@ -80,7 +80,7 @@ def main(_):
             action_horizon=50, # The size of the action chunk (present and future actions) to include in the chunked actions.
         ),
         frame_transform_kwargs=dict(
-            resize_size={"primary": (256, 256)},
+            resize_size={"primary": (256, 256), "wrist": (256, 256)},
         ),
         train=True,
     )
@@ -107,7 +107,6 @@ def main(_):
     # following Zhao et al. we use "action chunks" of length 50 and L1 loss for ALOHA
     ##TODO：预处理
     config = pretrained_model.config
-    # ### EMMA: 又感觉不应该删掉这个proprio，因为这个proprio是state
     config["model"]["observation_tokenizers"]["proprio"] = ModuleSpec.create(
         LowdimObsTokenizer,
         n_bins=256,

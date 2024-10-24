@@ -63,10 +63,10 @@ def wait_for_message(node ,topic_type, topic):
     # unsubcription
     subscription.destroy()
 
-def get_observation(node ,topic_type, topic, size=(256,256,3)):
+def get_observation(node ,topic_type, topic):
 
     input_images = wait_for_message(node, topic_type, topic)
-    input_images = np.array(input_images.data).reshape(size)
+    input_images = np.frombuffer(input_images.data, dtype=np.uint8).reshape(input_images.height, input_images.width, 3)
 
     # input_images = np.stack(input_images)[None]
     # input_images = np.stack(input_images)[None]
